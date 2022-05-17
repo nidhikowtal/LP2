@@ -1,0 +1,152 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define MAX 20
+
+class Graph
+{
+private:
+	typedef struct Node
+	{
+		int vertex;
+		struct Node *next;
+	} node;
+	node *head[MAX]; // adjacent list
+	int visited[MAX];
+public:
+	Graph();
+	void create();
+	void clean_visit();
+	void DFS(int);
+	void BFS(queue<int> &q);
+};
+
+Graph::Graph()
+{
+	int i;
+	for (i = 0; i < MAX; ++i)
+		visited[i] = false;
+	for (i = 0; i < MAX; ++i)
+		head[i] = NULL;
+}
+
+void Graph::create()
+{
+	int v1, v2;
+	char ans = 'y';
+	node *New;
+	node *first;
+	cout << "\n Enter edges of graph (space separated):-\n" << endl;
+	do
+	{
+		cout << " Enter the edge: ";
+		cin >> v1 >> v2;
+		if (v1 >= MAX || v2 >= MAX)
+			cout << "\n Invalid vertex value.." << endl;
+		else
+		{
+			// link from v1 to v2
+			New = new node;
+			if (New == NULL)
+				cout << "\n Insufficient memory.." << endl;
+			New->vertex = v2;
+			New->next = NULL;
+			first = head[v1];
+			if (first == NULL)
+				head[v1] = New;
+			else
+			{
+				while(first->next != NULL)
+					first = first->next;
+				first->next = New;
+			}
+			// link from v2 to v1
+			New = new node;
+			if (New == NULL)
+				cout << "\n Insufficient memory.." << endl;
+			New->vertex = v1;
+			New->next = NULL;
+			first = head[v2];
+			if (first == NULL)
+				head[v2] = New;
+			else
+			{
+				while(first->next != NULL)
+					first = first->next;
+				first->next = New;
+			}
+		}
+		cout << "\n Add more edges? (y/n): ";
+		cin >> ans;
+	} while(ans == 'y' || ans == 'Y');
+}
+
+void Graph::clean_visit()
+{
+	int i;
+	for (i = 0; i < MAX; ++i)
+		visited[i] = false;
+}
+
+void Graph::DFS(int v)
+{
+	node *first;
+	cout << v << "  ";
+	visited[v] = true;
+	first = head[v];
+	while (first != NULL)
+	{
+		if (!visited[first->vertex])
+			DFS(first->vertex);
+		else
+			first = first->next;
+	}
+}
+
+void Graph::BFS(queue<int> &q)
+{
+	if(q.empty())
+		return;
+	int v = q.front();
+	q.pop();
+	cout << v << "  ";
+	visited[v] = true;
+	node *first;
+	first = head[v];
+	while (first != NULL)
+	{
+		if (!visited[first->vertex])
+		{
+			q.push(first->vertex);
+			visited[first->vertex] = true;
+			first = first->next;
+		}
+		else
+			first = first->next;
+	}
+
+	BFS(q);
+}
+
+int main()
+{
+	Graph obj;
+	int vertex;
+	obj.create();
+	queue<int> q;
+	cout << "\n Enter vertex to start search: ";
+	cin >> vertex;
+	if (vertex >= MAX)
+		cout << "\n Invalid vertex value.." << endl;
+	else
+	{
+		cout << "\n Depth First Search:-\n\t";
+		obj.DFS(vertex);
+		cout << "\n\n Breadth First Search:-\n\t";
+		q.push(vertex);
+		obj.clean_visit();
+		obj.BFS(q);
+	}
+
+	return 0;
+}
